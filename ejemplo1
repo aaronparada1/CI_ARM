@@ -1,0 +1,37 @@
+Ejemplo codigo controlador de interrupciones con 2 perifericos
+Teclado: Periferico nº 0, PE : 0; PD : 1; DIR.VECT : 0
+Pantalla: Periferico nº 1, PE : 2; PD : 3; DIR.VECT : 2
+
+MASC:       .byte 0x03
+
+RCI_ENT     PROC
+    PUSH    {R0, R1, R2, LR}            ; Guarda R0, R1, R2 y LR en la pila
+
+    MOVS    R0, #0                      ; R0 = 0 (CLR .0)
+    LDR     R2, =MASC                   ; Carga en r2 la etiqueta de la mascara
+    LDRB    R2, [R2]                    ; Carga en r2 el contenido de la etiqueta de la mascara
+    LDRB    R1, [R0]                    ; Leer byte desde la dirección apuntada por R0 en R1 (IN .1,[.0])
+    MVNS    R1, R1                      ; NOT R1
+    ANDS    R1, R1, #MASC               ; AND R1, #MASC
+
+    BNE     ES_PANTA                    ; Si el resultado de AND no es cero, ir a ES_PANTA
+
+LLAMA
+    LDR     R2, =tabla_de_manejadores   ; Cargar la dirección de la tabla de manejadores en R2
+    LDR     R2, [R2, R0, LSL #2]        ; Cargar la dirección del manejador específico desde la tabla usando R0 como índice
+    BLX     R2                          ; Llamar al manejador específico
+
+    POP     {R0, R1, R2, PC}            ; Restaurar R0, R1, R2 y retornar (usando PC)
+
+ES_PANTA
+    MOVS    R0, #2                      ; Cargar 2 en R0
+    B       LLAMA                       ; Ir a LLAMA
+
+    ENDP
+
+    ALIGN
+
+tabla_de_manejadores
+    DCD     manejador_0                 ; Dirección de los manejadores
+    DCD     manejador_1
+    ; Agregar más manejadores según sea necesario

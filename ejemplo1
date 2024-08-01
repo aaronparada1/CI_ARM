@@ -12,7 +12,7 @@ RCI_ENT     PROC
     LDRB    R2, [R2]                    ; Carga en r2 el contenido de la etiqueta de la mascara
     LDRB    R1, [R0]                    ; Leer byte desde la dirección apuntada por R0 en R1 (IN .1,[.0])
     MVNS    R1, R1                      ; NOT R1
-    ANDS    R1, R1, #MASC               ; AND R1, #MASC
+    ANDS    R1, R1, R2                  ; AND R1, #MASC
 
     BNE     ES_PANTA                    ; Si el resultado de AND no es cero, ir a ES_PANTA
 
